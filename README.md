@@ -36,7 +36,7 @@ Veri setimiz, 2010-2011 yıllarına ait online perakende işlemlerini içeriyor.
 - Negatif veya sıfır Quantity ve UnitPrice değerleri çıkarıldı.
 - TotalPrice değişkeni (Quantity × UnitPrice) hesaplandı.
 
-## 3. Özellik Mühendisliği
+## 3. Özellik Mühendisliği (Feature Engineering)
 
 - **Zaman Bilgisi:**  
   InvoiceDate’i ay bilgisine çevirip, sinüs (`Month_sin`) ve kosinüs (`Month_cos`) dönüşümleriyle işliyoruz. Bu sayede, yılın belirli aylarında oluşan satış artışları/düşüşleri gibi döngüsel etkileri yakalayabiliyoruz.
