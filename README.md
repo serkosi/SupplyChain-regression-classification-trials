@@ -16,7 +16,7 @@ Bu projede, Random Forest algoritmasını hem regresyon hem de sınıflandırma 
 - **Amaç:**  
   Bayilerin geçmiş satın alma verilerine dayanarak, gelecekte tekrar alışveriş yapıp yapmayacaklarını tahmin etmek. Böylece, kayıp riski yüksek bayilere yönelik önlemler alınabilir.
 
-## 2. Veri Seti ve Özellikler
+## 2. Veri Seti ve Degiskenler
 
 Kullanılan veri seti, 2010-2011 yıllarına ait online perakende satış verilerinden uyarlanmıştır. Ancak senaryomuzda:
 - **City:**  
@@ -34,7 +34,7 @@ Kullanılan veri seti, 2010-2011 yıllarına ait online perakende satış verile
 - Eksik bayi (CustomerID) kayıtları temizlendi.
 - Negatif veya sıfır Quantity ve UnitPrice değerleri çıkarıldı.
 
-## 3. Özellik Mühendisliği (Feature Engineering)
+## 3. Degisken Mühendisliği (Feature Engineering)
 
 ### Regresyon Modeli
 - **Günlük Toplamlar:**  
@@ -49,7 +49,7 @@ Kullanılan veri seti, 2010-2011 yıllarına ait online perakende satış verile
   *Neden?* Böylece model, farklı şehirlerdeki satış trendlerini öğrenebilir ve bölge bazlı performans analizleri yapılabilir.
 
   ### Siniflandirma Modeli
-  - **Kategorik Özelliğin Kodlanması:**  
+  - **Kategorik Degiskenin Kodlanması:**  
   Country sütunu, LabelEncoder kullanılarak sayısal forma dönüştürülmüştür.
 
 - **Müşteri Düzeyinde Aggregasyon:**
@@ -66,13 +66,13 @@ Kullanılan veri seti, 2010-2011 yıllarına ait online perakende satış verile
 
 ## 4. Model Eğitimi ve Değerlendirmesi
 
-Özellikler ve hedef değişken, her iki model icin de, %80 eğitim ve %20 test olarak bölündü.
+Degiskenler ve hedef değişken, her iki model icin de, %80 eğitim ve %20 test olarak bölündü.
 ### Regresyon Modeli
 - **Model:** Random Forest Regressor
 - **Hedef:** Quantity Trend (Günlük toplam Quantity verisinin mevsimsel ayrıştırmadan elde edilen trend bileşeni)
-- **Kullanılan Özellikler:**  
+- **Kullanılan Degiskenler:**  
   - Ham değerler: UnitPrice  
-  - Zaman tabanlı özellikler: Month, WeekOfYear
+  - Zaman tabanlı degiskenler: Month, WeekOfYear
 - **Hiperparametreler:**  
   - n_estimators = 100  
   - random_state = 42  
