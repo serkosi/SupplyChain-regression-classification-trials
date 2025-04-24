@@ -1,111 +1,111 @@
-# Random Forest ile Makine Öğrenmesi Uygulaması
+# Regression and Classification Trials for a Supply Chain Management Case
 
-Bu projede, Random Forest algoritmasını hem regresyon hem de sınıflandırma problemlerinde uyguluyoruz. Odak noktamız, Türkiye’deki farklı şehirlerdeki dağıtım depolarına sahip bir üretici firma. Bu firma, ürünlerini bayilerine satıyor; yani müşteriler, firmadan ürün alan bayiler oluyor.
+In this project, we apply the Random Forest algorithm to both regression and classification problems. Our focus is on a manufacturing company with distribution warehouses in different cities. This company sells its products to dealers, meaning the customers are the dealers who purchase products from the company.
 
-## 1. Görev Tanımları
+## 1. Task Descriptions
 
-### Regresyon Görevi
-- **Hedef Değişken:** **Satın Alma Miktari Trendi (Quantity_Trend)**
-- **Amaç:**  
-  Üretici firmanın, farklı şehirlerdeki dağıtım depolarından yapılan satış verilerine dayanarak bayilere yapılan toplam satış miktarini tahmin etmek. Bu sayede, hangi şehirdeki depo daha yüksek satış yapıyor, buna göre strateji belirlenebilir.
+### Regression Task
+- **Target Variable:** **Purchase Quantity Trend (Quantity_Trend)**
+- **Objective:**  
+  To predict the total sales quantity made to dealers based on the sales data from distribution warehouses in different cities. This allows determining which city's warehouse has higher sales, enabling strategy formulation accordingly.
   
-  Özellikle, günlük bazda hesaplanan Quantity (satın alınan ürün adedi) verisinin mevsimsel bileşenlerinden elde edilen trend kısmını tahmin etmek amaçlanmıştır. Böylece, satış miktarındaki genel eğilim incelenerek geleceğe yönelik öngörüler elde edilebilir.
+  Specifically, the goal is to predict the trend component obtained from the seasonal decomposition of the daily Quantity (number of products purchased) data. This way, the general trend in sales quantity can be analyzed to make future predictions.
 
-### Sınıflandırma Görevi
-- **Hedef Değişken:** **Bayi Kaybı (Churn)** (1: Bayi alışveriş yapmayı durdurdu, 0: Alışverişe devam ediyor)
-- **Amaç:**  
-  Bayilerin geçmiş satın alma verilerine dayanarak, gelecekte tekrar alışveriş yapıp yapmayacaklarını tahmin etmek. Böylece, kayıp riski yüksek bayilere yönelik önlemler alınabilir.
+### Classification Task
+- **Target Variable:** **Dealer Churn (Churn)** (1: Dealer stopped purchasing, 0: Dealer continues purchasing)
+- **Objective:**  
+  To predict whether dealers will make future purchases based on their past purchasing data. This allows taking preventive measures for dealers at high risk of churn.
 
-## 2. Veri Seti ve Degiskenler
+## 2. Dataset and Variables
 
-Kullanılan veri seti, 2010-2011 yıllarına ait online perakende satış verilerinden uyarlanmıştır. Ancak senaryomuzda:
+The dataset used is adapted from online retail sales data from 2010-2011. However, in our scenario:
 - **City:**  
-  Veri setindeki “Country” değişkeni, artık üretici firmanın ürünlerini dağıttığı şehirleri temsil ediyor. Her satır, satışın belirli bir şehirdeki dağıtım deposundan yapıldığını gösterir.
-- Diğer ana sütunlar:
-  - **InvoiceNo:** Fatura numarası (benzersiz)
-  - **StockCode:** Ürün kodu
-  - **Description:** Ürün adı
-  - **Quantity:** Satın alınan ürün adedi
-  - **InvoiceDate:** İşlem tarihi
-  - **UnitPrice:** Ürün birim fiyatı
-  - **CustomerID:** Bayinin benzersiz kimliği
+  The "Country" variable in the dataset now represents the cities where the manufacturer distributes its products. Each row indicates that the sale was made from a distribution warehouse in a specific city.
+- Other main columns:
+  - **InvoiceNo:** Invoice number (unique)
+  - **StockCode:** Product code
+  - **Description:** Product name
+  - **Quantity:** Number of products purchased
+  - **InvoiceDate:** Transaction date
+  - **UnitPrice:** Unit price of the product
+  - **CustomerID:** Unique ID of the dealer
 
-### Veri Ön İşleme
-- Eksik bayi (CustomerID) kayıtları temizlendi.
-- Negatif veya sıfır Quantity ve UnitPrice değerleri çıkarıldı.
+### Data Preprocessing
+- Records with missing dealer (CustomerID) information were removed.
+- Negative or zero values in Quantity and UnitPrice were excluded.
 
-## 3. Degisken Mühendisliği (Feature Engineering)
+## 3. Feature Engineering
 
-### Regresyon Modeli
-- **Günlük Toplamlar:**  
-  Veri seti, sadece sayısal sütunlar seçilerek günlük bazda (resample('D')) toplam değerler elde edilecek şekilde yeniden düzenlendi.
+### Regression Model
+- **Daily Totals:**  
+  The dataset was reorganized to calculate daily totals (resample('D')) by selecting only numerical columns.
 
-- **Mevsimsel Ayristirma (Seasonal Decompose):**  
-  - Quantity ve UnitPrice sütunları, 30 günlük periyotlarla mevsimsel ayrıştırma işlemine tabi tutuldu.
-  - Ayrıştırma sonucunda, özellikle Quantity için elde edilen trend bileşeni, modelin hedef değişkeni olarak belirlendi.
+- **Seasonal Decomposition:**  
+  - The Quantity and UnitPrice columns were subjected to seasonal decomposition with 30-day periods.
+  - As a result of the decomposition, the trend component obtained for Quantity was determined as the target variable for the model.
 
-- **City (Dağıtım Deposu):**  
-  City değişkeni, üretici firmanın farklı şehirlerdeki dağıtım depolarını temsil eder. Kategorik bir değişken olarak sayısallaştırılarak modele dahil edilir.  
-  *Neden?* Böylece model, farklı şehirlerdeki satış trendlerini öğrenebilir ve bölge bazlı performans analizleri yapılabilir.
+- **City (Distribution Warehouse):**  
+  The City variable represents the manufacturer's distribution warehouses in different cities. It is included in the model as a categorical variable after being numerically encoded.  
+  *Why?* This allows the model to learn sales trends in different cities and enables region-based performance analysis.
 
-  ### Siniflandirma Modeli
-  - **Kategorik Degiskenin Kodlanması:**  
-  Country sütunu, LabelEncoder kullanılarak sayısal forma dönüştürülmüştür.
+### Classification Model
+- **Encoding Categorical Variables:**  
+  The Country column was converted to numerical form using LabelEncoder.
 
-- **Müşteri Düzeyinde Aggregasyon:**
-  Müşteriler (CustomerID) bazında aşağıdaki metrikler hesaplanmıştır:
-  - TotalSpend: Toplam harcama (TotalPrice toplamı)
-  - OrderCount: Benzersiz fatura sayısı (alışveriş sayısı)
-  - AvgOrderValue: Ortalama fatura değeri
-  - Country: Müşterinin ait olduğu ülke (kodlanmış)
-  - LastPurchase: En son satın alma tarihi
+- **Customer-Level Aggregation:**
+  The following metrics were calculated for each customer (CustomerID):
+  - TotalSpend: Total spending (sum of TotalPrice)
+  - OrderCount: Number of unique invoices (number of purchases)
+  - AvgOrderValue: Average invoice value
+  - Country: Country of the customer (encoded)
+  - LastPurchase: Date of the last purchase
 
-- **Churn Tanımlama:**  
-  - Veri setindeki en son tarih referans alınarak, her müşterinin en son satın alma tarihi ile arasındaki fark hesaplandı.
-  - 180 günden fazla süredir alışveriş yapmayan müşteriler churn (1), aksi halde churn (0) olarak etiketlendi.
+- **Defining Churn:**  
+  - Using the latest date in the dataset as a reference, the difference between each customer's last purchase date and the reference date was calculated.
+  - Customers who had not made a purchase for more than 180 days were labeled as churn (1), otherwise as not churn (0).
 
-## 4. Model Eğitimi ve Değerlendirmesi
+## 4. Model Training and Evaluation
 
-Degiskenler ve hedef değişken, her iki model icin de, %80 eğitim ve %20 test olarak bölündü.
-### Regresyon Modeli
+The variables and target variable were split into 80% training and 20% testing for both models.
+### Regression Model
 - **Model:** Random Forest Regressor
-- **Hedef:** Quantity Trend (Günlük toplam Quantity verisinin mevsimsel ayrıştırmadan elde edilen trend bileşeni)
-- **Kullanılan Degiskenler:**  
-  - Ham değerler: UnitPrice  
-  - Zaman tabanlı degiskenler: Month, WeekOfYear
-- **Hiperparametreler:**  
+- **Target:** Quantity Trend (Trend component obtained from seasonal decomposition of daily total Quantity data)
+- **Variables Used:**  
+  - Raw values: UnitPrice  
+  - Time-based variables: Month, WeekOfYear
+- **Hyperparameters:**  
   - n_estimators = 100  
   - random_state = 42  
-- **Değerlendirme:**  
-  Model performansı, RMSE (Root Mean Squared Error) kullanılarak ölçülür. Ayrıca, basit bir ortalama tahmini (baseline) ile karşılaştırılır.
+- **Evaluation:**  
+  Model performance is measured using RMSE (Root Mean Squared Error). It is also compared with a simple average prediction (baseline).
 
-### Siniflandirma Modeli
-- **En Iyi Model Secimi** 
-  - Hiperparametre optimizasyonu sonucunda en iyi performansı gösteren Random Forest sınıflandırma modeli seçildi.
-- **Performans Ölcütleri** 
-  - Accuracy (Doğruluk)
-  - Classification Report: Precision, Recall, F1-score gibi metrikler kullanılarak modelin sınıflandırma başarısı değerlendirildi.
+### Classification Model
+- **Best Model Selection**  
+  - The Random Forest classification model with the best performance was selected after hyperparameter optimization.
+- **Performance Metrics**  
+  - Accuracy
+  - Classification Report: Metrics such as Precision, Recall, and F1-score were used to evaluate the classification success of the model.
 
-## 5. Modelin Tedarik Zinciri Uygulamalarında Kullanımı
+## 5. Application of the Model in Supply Chain Management
 
-- **Satış Raporları ve Stok Yönetimi:**  
-  Modelimiz, farklı şehirlerdeki dağıtım depolarından yapılan satış miktarlarini tahmin ederek, tedarikçilerin stok planlamasında yardımcı olabilir. Örneğin, belirli bir şehirde satışların artması bekleniyorsa, o bölge için daha fazla stok tutulabilir.
+- **Sales Reports and Inventory Management:**  
+  Our model can help suppliers with inventory planning by predicting sales quantities from distribution warehouses in different cities. For example, if sales are expected to increase in a specific city, more inventory can be held in that region.
 
-- **Bayi Yönetimi ve Pazarlama:**  
-  Müşteri kaybı tahminleri sayesinde, bayilerin alışveriş yapma olasılığı değerlendirilebilir. Böylece, kayıp riski yüksek bayilere özel kampanyalar düzenlenerek müşteri ilişkileri güçlendirilebilir.
+- **Dealer Management and Marketing:**  
+  Dealer churn predictions allow evaluating the likelihood of dealers making purchases. Thus, special campaigns can be organized for high-risk dealers to strengthen customer relationships.
 
-- **Dinamik Fiyatlandırma:**  
-  Bölge bazında satış trendlerine göre, fiyatlandırma stratejileri geliştirilebilir. Örneğin, talebin yoğun olduğu dönemlerde fiyatlar optimize edilerek kâr artırılabilir.
+- **Dynamic Pricing:**  
+  Pricing strategies can be developed based on regional sales trends. For example, prices can be optimized during periods of high demand to increase profits.
 
-## 6. Değerlendirme
+## 6. Evaluation
 
-- **Regresyon için:**  
-  Modelin performansı, RMSE ile ölçülür. Basit bir ortalama tahmini ile kıyaslanarak modelin ne kadar geliştiği analiz edilir.
-- **Sınıflandırma için:**  
-  Doğruluk, F1-skoru gibi metrikler kullanılarak model performansı değerlendirilir.
+- **For Regression:**  
+  The model's performance is measured using RMSE. The improvement of the model is analyzed by comparing it with a simple average prediction.
+- **For Classification:**  
+  Metrics such as Accuracy and F1-score are used to evaluate the model's performance.
 
-Temel fark; regresyon sürekli değişkenleri tahmin etmeye, sınıflandırma ise verileri belirli sınıflara ayırmaya yöneliktir.
+The main difference is that regression aims to predict continuous variables, while classification aims to categorize data into specific classes.
 
 ---
 
-Bu proje, Random Forest algoritmasını kullanarak, üretici firmanın farklı şehirlerdeki dağıtım depolarından yapılan satışları (TotalPrice) tahmin etmeyi ve bayilerin alışveriş davranışlarını sınıflandırmayı amaçlamaktadır. Böylece, tedarik zinciri yönetimi, pazarlama stratejileri ve stok planlaması gibi alanlarda daha bilinçli kararlar alınabilir.
+This project aims to predict sales (TotalPrice) from the manufacturer's distribution warehouses in different cities and classify dealer purchasing behaviors using the Random Forest algorithm. This enables more informed decisions in areas such as supply chain management, marketing strategies, and inventory planning.
