@@ -67,6 +67,7 @@ The dataset used is adapted from online retail sales data from 2010-2011. Howeve
 ## 4. Model Training and Evaluation
 
 The variables and target variable were split into 80% training and 20% testing for both models.
+
 ### Regression Model
 - **Model:** Random Forest Regressor
 - **Target:** Quantity Trend (Trend component obtained from seasonal decomposition of daily total Quantity data)
@@ -76,36 +77,52 @@ The variables and target variable were split into 80% training and 20% testing f
 - **Hyperparameters:**  
   - n_estimators = 100  
   - random_state = 42  
-- **Evaluation:**  
-  Model performance is measured using RMSE (Root Mean Squared Error). It is also compared with a simple average prediction (baseline).
 
 ### Classification Model
-- **Best Model Selection**  
-  - The Random Forest classification model with the best performance was selected after hyperparameter optimization.
-- **Performance Metrics**  
-  - Accuracy
-  - Classification Report: Metrics such as Precision, Recall, and F1-score were used to evaluate the classification success of the model.
+- **Model selection:** The best Random Forest classifier was selected through randomized hyperparameter search.
 
-## 5. Application of the Model in Supply Chain Management
+### Evaluation
+- **Regression:** The test-set RMSE is **1,195.34**, compared with **3,742.99** for a baseline that predicts the training-target mean. Lower RMSE indicates better predictions.
+- **Classification:** Test accuracy is **80.99%**. However, churn recall is only **0.05** (8 of 165 churn cases detected), so accuracy alone overstates how well the model identifies churn. The model requires further improvement before it can reliably support churn-prevention decisions.
+- Regression predicts a continuous quantity trend; classification assigns dealers to churn or active classes.
 
-- **Sales Reports and Inventory Management:**  
-  Our model can help suppliers with inventory planning by predicting sales quantities from distribution warehouses in different cities. For example, if sales are expected to increase in a specific city, more inventory can be held in that region.
+## 5. Results and Visualizations
 
-- **Dealer Management and Marketing:**  
-  Dealer churn predictions allow evaluating the likelihood of dealers making purchases. Thus, special campaigns can be organized for high-risk dealers to strengthen customer relationships.
+The figures below summarize the daily sales trends, regression predictions, and classification model analysis. The PCA decision-boundary figures are visualizations in reduced feature space.
 
-- **Dynamic Pricing:**  
-  Pricing strategies can be developed based on regional sales trends. For example, prices can be optimized during periods of high demand to increase profits.
+### Regression
 
-## 6. Evaluation
+<table>
+  <tr>
+    <td colspan="2"><strong>Daily trends</strong><br>The figure compares observed daily quantity and unit price with their 30-day seasonal-decomposition trend components. The quantity trend is used as the regression target.<p align="center"><img src="output/regression_seasonal_decomposition.png" alt="Daily quantity and unit-price seasonal decomposition" width="75%"></p></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="output/regression_feature_importance.png" alt="Regression feature importance" width="100%"></td>
+    <td width="50%"><strong>Feature importance</strong><br><code>WeekOfYear</code> contributes the most among the three features used by this fitted model, followed by <code>UnitPrice</code> and <code>Month</code>. Importance indicates contribution to this model, not causation.</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="output/regression_actual_vs_predicted.png" alt="Actual versus predicted quantity trend" width="100%"></td>
+    <td width="50%"><strong>Actual vs. predicted</strong><br>Each point compares a test-set actual value with its prediction. The dashed line marks perfect agreement; points closer to it have smaller prediction errors. The test RMSE is 1,195.34.</td>
+  </tr>
+</table>
 
-- **For Regression:**  
-  The model's performance is measured using RMSE. The improvement of the model is analyzed by comparing it with a simple average prediction.
-- **For Classification:**  
-  Metrics such as Accuracy and F1-score are used to evaluate the model's performance.
+### Classification
 
-The main difference is that regression aims to predict continuous variables, while classification aims to categorize data into specific classes.
-
----
-
-This project aims to predict sales (TotalPrice) from the manufacturer's distribution warehouses in different cities and classify dealer purchasing behaviors using the Random Forest algorithm. This enables more informed decisions in areas such as supply chain management, marketing strategies, and inventory planning.
+<table>
+  <tr>
+    <td width="50%"><img src="output/classification_feature_importance.png" alt="Classification feature importance" width="100%"></td>
+    <td width="50%"><strong>Feature importance</strong><br><code>OrderCount</code> has the highest importance in the selected classifier, followed by <code>TotalSpend</code> and <code>AvgOrderValue</code>. Importance indicates contribution to this model, not causation.</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="output/classification_decision_boundary_pca.png" alt="Churn decision boundary in two PCA dimensions" width="100%"></td>
+    <td width="50%"><strong>2D PCA decision boundary</strong><br>This plot projects the data onto two principal components and colors points by churn status. The boundary is from a classifier trained in that reduced space; it is a visual aid, not the evaluation of the selected full-feature model.</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="output/classification_pca_3d_scatter.png" alt="Customer data projected onto three PCA components" width="100%"></td>
+    <td width="50%"><strong>3D PCA projection</strong><br>Each point represents a customer projected onto three principal components and colored by churn status. The projection helps inspect the data visually but does not show all original feature information.</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="output/classification_decision_boundary_3d.png" alt="Churn decision boundary across 3D PCA slices" width="100%"></td>
+    <td width="50%"><strong>3D PCA decision-boundary slices</strong><br>Colored planes show the predicted churn classes at selected slices through the three-component PCA space. This is an illustrative view of a model trained in that reduced space, not a substitute for the full-feature model metrics.</td>
+  </tr>
+</table>
